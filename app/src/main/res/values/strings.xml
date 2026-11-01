@@ -28,6 +28,9 @@
     <string name="solution_title">Solution</string>
     <string name="solution_playing">Playing the solution…</string>
     <string name="solution_done">That was the solution, %1$d moves. Your turn?</string>
+    <string name="settings">Settings</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="preview_option">Show which symbol would land in each neighbouring cell</string>
     <string name="rules_title">How to play</string>
     <string name="rules_text">Tip the glass tetrahedron onto a neighbouring triangle by tapping it. It does not slide – it rolls over an edge, so the symbol that ends up on the bottom changes with every move.\n\nReach the gold goal before you run out of steps.\n\nBlue cells give extra steps – but only if the symbol lying on the bottom is the one shown in the cell. You will not reach the goal without them.\n\nPurple cells spin the piece a third of a turn every time you land on them.\n\nIf the goal shows a symbol, you must arrive with that symbol on the bottom.\n\nThe faint symbols in the neighbouring cells show what would land there. The timer starts on your first move.</string>
 </resources>

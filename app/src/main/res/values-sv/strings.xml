@@ -24,6 +24,9 @@
     <string name="solution_title">Lösning</string>
     <string name="solution_playing">Spelar upp lösningen…</string>
     <string name="solution_done">Det var lösningen, %1$d drag. Din tur?</string>
+    <string name="settings">Inställningar</string>
+    <string name="difficulty">Svårighetsgrad</string>
+    <string name="preview_option">Visa vilken symbol som hamnar i grannrutorna</string>
     <string name="rules_title">Så spelar du</string>
     <string name="rules_text">Välta glastetraedern till en intilliggande trekant genom att trycka på den. Pjäsen glider inte – den rullar över en kant, så symbolen som hamnar nedåt ändras vid varje drag.\n\nTa dig till guldrutan innan stegen tar slut.\n\nBlå rutor ger extra steg – men bara om symbolen som ligger nedåt är den som visas i rutan. Utan dem når du inte målet.\n\nLila rutor vrider pjäsen ett tredjedels varv varje gång du landar där.\n\nVisar målet en symbol måste du komma dit med just den symbolen nedåt.\n\nDe svaga symbolerna i grannrutorna visar vad som skulle hamna nedåt där. Tiden startar vid ditt första drag.</string>
 </resources>

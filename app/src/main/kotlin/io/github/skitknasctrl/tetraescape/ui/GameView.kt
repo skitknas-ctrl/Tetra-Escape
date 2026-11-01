@@ -19,6 +19,7 @@ import io.github.skitknasctrl.tetraescape.engine.Cell
 import io.github.skitknasctrl.tetraescape.engine.GameState
 import io.github.skitknasctrl.tetraescape.engine.Level
 import io.github.skitknasctrl.tetraescape.engine.Orientation
+import io.github.skitknasctrl.tetraescape.engine.Pt
 import io.github.skitknasctrl.tetraescape.engine.Status
 import io.github.skitknasctrl.tetraescape.engine.Symbol
 import kotlin.math.abs
@@ -74,25 +75,36 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     private var downY = 0f
 
     // ---- paints ----
-    private val cellFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFAF8F3.toInt(); style = Paint.Style.FILL }
-    private val holeFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFD9D5CC.toInt(); style = Paint.Style.FILL }
-    private val cellLine = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFB9B4A9.toInt(); style = Paint.Style.STROKE }
-    private val legalLine = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF3C8D5A.toInt(); style = Paint.Style.STROKE }
-    private val bonusFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFDCEBFA.toInt() }
-    private val bonusInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF1E66C8.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
-    private val bonusInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF1E66C8.toInt(); style = Paint.Style.FILL }
-    private val spinFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFEADCF7.toInt() }
-    private val spinInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF7B3FB5.toInt(); style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND }
-    private val goalFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFE082.toInt() }
-    private val goalInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF8A6400.toInt(); style = Paint.Style.STROKE }
-    private val goalInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF8A6400.toInt(); style = Paint.Style.FILL }
-    private val usedFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFE6E3DC.toInt() }
-    private val usedInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFB0ACA3.toInt(); style = Paint.Style.STROKE }
-    private val usedInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFB0ACA3.toInt(); style = Paint.Style.FILL }
-    private val startInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF6F6A60.toInt(); style = Paint.Style.STROKE }
-    private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF1E66C8.toInt(); textAlign = Paint.Align.CENTER; isFakeBoldText = true }
-    private val previewInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x553C8D5A; style = Paint.Style.STROKE }
-    private val previewInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x553C8D5A; style = Paint.Style.FILL }
+    // board look: cream tiles, gold grid with a gold bead at every vertex, grey stone for holes,
+    // coloured glass for special tiles
+    private val cellFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFF8F3E8.toInt(); style = Paint.Style.FILL }
+    private val cellInner = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x66FFFFFF; style = Paint.Style.STROKE }
+    private val holeFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFA8A49C.toInt(); style = Paint.Style.FILL }
+    private val holeInner = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x33000000; style = Paint.Style.STROKE }
+    private val cellLine = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFC49A3C.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
+    private val cellLineHi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x99FFE9A8.toInt(); style = Paint.Style.STROKE }
+    private val dotFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFD4AA48.toInt(); style = Paint.Style.FILL }
+    private val dotHi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xCCFFF2C2.toInt(); style = Paint.Style.FILL }
+    private val dotEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF8E6A1E.toInt(); style = Paint.Style.STROKE }
+    private val boardShadow = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x16000000; style = Paint.Style.FILL }
+    private val legalLine = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF2E9E66.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
+    private val legalTint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x2E3CC07A; style = Paint.Style.FILL }
+    private val bonusFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFB6DCFF.toInt() }
+    private val bonusInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF1B5FC2.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
+    private val bonusInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF1B5FC2.toInt(); style = Paint.Style.FILL }
+    private val spinFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFDDB9F5.toInt() }
+    private val spinInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF6E2FB0.toInt(); style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND }
+    private val goalFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFF5C844.toInt() }
+    private val goalInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF7A5600.toInt(); style = Paint.Style.STROKE }
+    private val goalInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF7A5600.toInt(); style = Paint.Style.FILL }
+    private val usedFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFE4E0D6.toInt() }
+    private val usedInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFADA89E.toInt(); style = Paint.Style.STROKE }
+    private val usedInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFADA89E.toInt(); style = Paint.Style.FILL }
+    private val glassHi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x55FFFFFF; style = Paint.Style.FILL }
+    private val startInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF8E6A1E.toInt(); style = Paint.Style.STROKE }
+    private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF1B5FC2.toInt(); textAlign = Paint.Align.CENTER; isFakeBoldText = true }
+    private val previewInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x662E9E66; style = Paint.Style.STROKE }
+    private val previewInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x662E9E66; style = Paint.Style.FILL }
     private val faceFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x5CFFFFFF; style = Paint.Style.FILL }
     private val faceEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xCC5E6E7E.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
     private val symInkBottom = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF222222.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
@@ -160,9 +172,13 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         scale = min(width / bw, height / bh).toFloat()
         ox = (width - (maxX - minX).toFloat() * scale) / 2f - minX.toFloat() * scale
         oy = height - (height - (maxY - minY).toFloat() * scale) / 2f + minY.toFloat() * scale
-        val lw = scale * 0.025f
+        val lw = scale * 0.032f
         cellLine.strokeWidth = lw
-        legalLine.strokeWidth = lw * 2.6f
+        cellLineHi.strokeWidth = lw * 0.35f
+        cellInner.strokeWidth = scale * 0.05f
+        holeInner.strokeWidth = scale * 0.05f
+        dotEdge.strokeWidth = scale * 0.012f
+        legalLine.strokeWidth = lw * 2.2f
         bonusInk.strokeWidth = scale * 0.04f
         spinInk.strokeWidth = scale * 0.045f
         goalInk.strokeWidth = scale * 0.04f
@@ -189,7 +205,10 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         val legal = if (st.status == Status.PLAYING && tipAnim == null) st.legalMoves() else emptyList()
         val legalCells = legal.map { st.cell.neighborAcross(it) }
 
+        drawBoardShadow(canvas, lv)
         for (c in lv.allCells) drawCell(canvas, st, c, legalCells.contains(c))
+        drawGrid(canvas, lv)
+        for (c in legalCells) { canvas.drawPath(cellPath(c), legalLine) }
         // preview of what lands where
         if (showPreview) for (color in legal) {
             val n = st.cell.neighborAcross(color)
@@ -208,15 +227,68 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         return path
     }
 
+    /** Soft shadow of the whole board, offset down-right. */
+    private fun drawBoardShadow(canvas: Canvas, lv: Level) {
+        val union = Path()
+        union.fillType = Path.FillType.WINDING
+        for (c in lv.allCells) {
+            c.corners.forEachIndexed { k, p ->
+                if (k == 0) union.moveTo(sx(Cell.ptX(p)), sy(Cell.ptY(p))) else union.lineTo(sx(Cell.ptX(p)), sy(Cell.ptY(p)))
+            }
+            union.close()
+        }
+        for (i in 1..3) {
+            canvas.save()
+            canvas.translate(scale * 0.03f * i, scale * 0.045f * i)
+            canvas.drawPath(union, boardShadow)
+            canvas.restore()
+        }
+    }
+
+    /** Gold grid lines over every edge and a gold bead on every vertex. */
+    private fun drawGrid(canvas: Canvas, lv: Level) {
+        val edges = HashSet<Long>()
+        val verts = HashSet<Pt>()
+        val lines = Path()
+        for (c in lv.allCells) {
+            val pts = c.corners
+            for (k in 0..2) {
+                val a = pts[k]; val b = pts[(k + 1) % 3]
+                verts.add(a)
+                val key = edgeKey(a, b)
+                if (edges.add(key)) {
+                    lines.moveTo(sx(Cell.ptX(a)), sy(Cell.ptY(a)))
+                    lines.lineTo(sx(Cell.ptX(b)), sy(Cell.ptY(b)))
+                }
+            }
+        }
+        canvas.drawPath(lines, cellLine)
+        canvas.drawPath(lines, cellLineHi)
+        val r = scale * 0.055f
+        for (v in verts) {
+            val x = sx(Cell.ptX(v)); val y = sy(Cell.ptY(v))
+            canvas.drawCircle(x, y, r, dotFill)
+            canvas.drawCircle(x, y, r, dotEdge)
+            canvas.drawCircle(x - r * 0.3f, y - r * 0.3f, r * 0.4f, dotHi)
+        }
+    }
+
+    private fun edgeKey(a: Pt, b: Pt): Long {
+        val (p, q) = if (a.i < b.i || (a.i == b.i && a.j < b.j)) a to b else b to a
+        return (((p.i + 1000L) * 4096 + (p.j + 1000L)) * 4096 + (q.i + 1000L)) * 4096 + (q.j + 1000L)
+    }
+
     private fun drawCell(canvas: Canvas, st: GameState, c: Cell, legal: Boolean) {
         val lv = st.level
         val sp = lv.specials[c]
         val p = cellPath(c)
         if (c in lv.holes) {
             canvas.drawPath(p, holeFill)
+            canvas.save(); canvas.clipPath(p); canvas.drawPath(p, holeInner); canvas.restore()
             return
         }
         val collected = sp != null && sp.bonus > 0 && st.isCollected(c)
+        val special = c == lv.goal || sp != null
         val fill = when {
             c == lv.goal -> goalFill
             collected -> usedFill
@@ -225,8 +297,15 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             else -> cellFill
         }
         canvas.drawPath(p, fill)
-        canvas.drawPath(p, cellLine)
-        if (legal) canvas.drawPath(p, legalLine)
+        if (special && !collected) {
+            // glass highlight: a lighter wedge in the apex half of the tile
+            canvas.save(); canvas.clipPath(p)
+            val (gx, gy) = c.center()
+            val apex = c.corners.first { pt -> if (c.up) pt.j == c.j + 1 else pt.j == c.j }
+            canvas.drawCircle(sx((Cell.ptX(apex) + gx) / 2), sy((Cell.ptY(apex) + gy) / 2), scale * 0.28f, glassHi)
+            canvas.restore()
+        }
+        if (legal) canvas.drawPath(p, legalTint)
 
         val (cx, cy) = c.center()
         val scx = sx(cx); val scy = sy(cy)

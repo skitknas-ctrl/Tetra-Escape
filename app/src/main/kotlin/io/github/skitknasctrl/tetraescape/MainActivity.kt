@@ -4,8 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.InputType
-import android.widget.Button
+import android.view.View
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -26,7 +29,7 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
     private lateinit var stepsView: TextView
     private lateinit var timeView: TextView
     private lateinit var levelView: TextView
-    private lateinit var difficultyGroup: RadioGroup
+    private lateinit var prefs: android.content.SharedPreferences
 
     private val executor = Executors.newSingleThreadExecutor()
     private var timer: CountDownTimer? = null
@@ -52,22 +55,15 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
         stepsView = findViewById(R.id.steps)
         timeView = findViewById(R.id.time)
         levelView = findViewById(R.id.level)
-        difficultyGroup = findViewById(R.id.difficulty)
         gameView.listener = this
 
-        val prefs = getSharedPreferences("tetra", MODE_PRIVATE)
+        prefs = getSharedPreferences("tetra", MODE_PRIVATE)
         difficulty = prefs.getInt("difficulty", 1)
-        difficultyGroup.check(
-            when (difficulty) { 2 -> R.id.diff2; 3 -> R.id.diff3; else -> R.id.diff1 }
-        )
-        difficultyGroup.setOnCheckedChangeListener { _, id ->
-            difficulty = when (id) { R.id.diff2 -> 2; R.id.diff3 -> 3; else -> 1 }
-            prefs.edit().putInt("difficulty", difficulty).apply()
-            newLevel(randomSeed())
-        }
-        findViewById<Button>(R.id.newLevel).setOnClickListener { newLevel(randomSeed()) }
-        findViewById<Button>(R.id.retry).setOnClickListener { level?.let { startLevel(it) } }
-        findViewById<Button>(R.id.help).setOnClickListener { showHelp() }
+        gameView.showPreview = prefs.getBoolean("preview", true)
+        findViewById<View>(R.id.newLevel).setOnClickListener { newLevel(randomSeed()) }
+        findViewById<View>(R.id.retry).setOnClickListener { level?.let { startLevel(it) } }
+        findViewById<View>(R.id.help).setOnClickListener { showHelp() }
+        findViewById<View>(R.id.settings).setOnClickListener { showSettings() }
         levelView.setOnClickListener { askForSeed() }
 
         val seed = savedInstanceState?.getLong("seed") ?: randomSeed()
@@ -202,6 +198,47 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
         replayShown = true
         levelView.text = getString(R.string.solution_playing)
         gameView.playSolution()
+    }
+
+    private fun showSettings() {
+        val dp = resources.displayMetrics.density
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((20 * dp).toInt(), (12 * dp).toInt(), (20 * dp).toInt(), 0)
+        }
+        box.addView(TextView(this).apply { text = getString(R.string.difficulty); setTextColor(getColor(R.color.ink_soft)) })
+        val group = RadioGroup(this)
+        val ids = IntArray(3)
+        for (d in 1..3) {
+            val rb = RadioButton(this).apply { id = View.generateViewId(); text = difficultyName(d) }
+            ids[d - 1] = rb.id
+            group.addView(rb)
+        }
+        group.check(ids[difficulty - 1])
+        box.addView(group)
+        val preview = CheckBox(this).apply {
+            text = getString(R.string.preview_option)
+            isChecked = gameView.showPreview
+            setPadding(paddingLeft, (12 * dp).toInt(), paddingRight, 0)
+        }
+        box.addView(preview)
+        dialog?.dismiss()
+        dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.settings)
+            .setView(box)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val newDifficulty = ids.indexOf(group.checkedRadioButtonId) + 1
+                gameView.showPreview = preview.isChecked
+                prefs.edit().putBoolean("preview", preview.isChecked).apply()
+                gameView.invalidate()
+                if (newDifficulty in 1..3 && newDifficulty != difficulty) {
+                    difficulty = newDifficulty
+                    prefs.edit().putInt("difficulty", difficulty).apply()
+                    newLevel(randomSeed())
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun showHelp() {

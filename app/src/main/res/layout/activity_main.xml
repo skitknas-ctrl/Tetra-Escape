@@ -1,128 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/root"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background"
-    android:padding="12dp">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_cloth"
+        android:contentDescription="@null" />
 
     <LinearLayout
+        android:id="@+id/root"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/steps_label"
-                android:textColor="@color/ink_soft"
-                android:textSize="13sp" />
-            <TextView
-                android:id="@+id/steps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="@color/ink"
-                android:textSize="34sp"
-                android:textStyle="bold" />
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/card_bg"
+                android:padding="8dp">
+                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_steps" android:contentDescription="@null" />
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/steps_label" android:textColor="@color/ink_soft" android:textSize="12sp" />
+                    <TextView android:id="@+id/steps" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/ink" android:textSize="30sp" android:textStyle="bold" android:fontFamily="serif" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/card_bg"
+                android:padding="8dp">
+                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_timer" android:contentDescription="@null" />
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/time_label" android:textColor="@color/ink_soft" android:textSize="12sp" />
+                    <TextView android:id="@+id/time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/ink" android:textSize="30sp" android:textStyle="bold" android:fontFamily="serif" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.3"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/card_bg"
+                android:padding="8dp">
+                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_pin" android:contentDescription="@null" />
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginStart="4dp">
+                    <TextView android:id="@+id/level" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="" android:textColor="@color/ink" android:textSize="14sp" android:textStyle="bold" android:fontFamily="serif" android:background="?attr/selectableItemBackground" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/timer_hint" android:textColor="@color/ink_soft" android:textSize="10sp" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <io.github.skitknasctrl.tetraescape.ui.GameView
+            android:id="@+id/game"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/time_label"
-                android:textColor="@color/ink_soft"
-                android:textSize="13sp" />
-            <TextView
-                android:id="@+id/time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="@color/ink"
-                android:textSize="34sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="4dp" />
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:gravity="center">
-            <TextView
-                android:id="@+id/level"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="@color/accent"
-                android:textSize="14sp"
-                android:padding="6dp"
-                android:background="?attr/selectableItemBackground" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/timer_hint"
-                android:textColor="@color/ink_soft"
-                android:textSize="11sp"
-                android:gravity="center" />
+            <ImageButton android:id="@+id/newLevel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="84dp" android:src="@drawable/gem_green" android:background="@drawable/glow_green" android:scaleType="fitCenter" android:padding="8dp" android:contentDescription="@string/new_level" />
+            <ImageButton android:id="@+id/retry" android:layout_width="0dp" android:layout_weight="1" android:layout_height="84dp" android:src="@drawable/gem_blue" android:background="@drawable/glow_blue" android:scaleType="fitCenter" android:padding="8dp" android:contentDescription="@string/retry" />
+            <ImageButton android:id="@+id/help" android:layout_width="0dp" android:layout_weight="1" android:layout_height="84dp" android:src="@drawable/gem_red" android:background="@drawable/glow_red" android:scaleType="fitCenter" android:padding="8dp" android:contentDescription="@string/rules_title" />
+            <ImageButton android:id="@+id/settings" android:layout_width="0dp" android:layout_weight="1" android:layout_height="84dp" android:src="@drawable/gem_gold" android:background="@drawable/glow_gold" android:scaleType="fitCenter" android:padding="8dp" android:contentDescription="@string/settings" />
         </LinearLayout>
     </LinearLayout>
-
-    <io.github.skitknasctrl.tetraescape.ui.GameView
-        android:id="@+id/game"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp" />
-
-    <RadioGroup
-        android:id="@+id/difficulty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
-        <RadioButton android:id="@+id/diff1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/difficulty_easy" android:textColor="@color/ink" />
-        <RadioButton android:id="@+id/diff2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/difficulty_medium" android:textColor="@color/ink" android:layout_marginStart="12dp" />
-        <RadioButton android:id="@+id/diff3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/difficulty_hard" android:textColor="@color/ink" android:layout_marginStart="12dp" />
-    </RadioGroup>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/newLevel"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="@string/new_level" />
-        <Button
-            android:id="@+id/retry"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/retry" />
-        <Button
-            android:id="@+id/help"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/help" />
-    </LinearLayout>
-</LinearLayout>
+</FrameLayout>
