@@ -10,6 +10,8 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import io.github.skitknasctrl.tetraescape.engine.GameState
 import io.github.skitknasctrl.tetraescape.engine.Generator
 import io.github.skitknasctrl.tetraescape.engine.Level
@@ -37,6 +39,14 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        // Android 15 draws apps edge to edge: keep our content clear of the status bar and navigation bar.
+        val root = findViewById<android.view.View>(R.id.root)
+        val basePad = root.paddingTop
+        ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            v.setPadding(basePad + bars.left, basePad + bars.top, basePad + bars.right, basePad + bars.bottom)
+            insets
+        }
         gameView = findViewById(R.id.game)
         stepsView = findViewById(R.id.steps)
         timeView = findViewById(R.id.time)
