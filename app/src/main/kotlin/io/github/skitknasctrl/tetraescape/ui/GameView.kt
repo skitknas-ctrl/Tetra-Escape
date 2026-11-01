@@ -46,6 +46,12 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     var listener: Listener? = null
     var showPreview = true
 
+    /** True while the stored solution is being played back automatically. */
+    var isAutoPlaying = false
+        private set
+    private val autoQueue = ArrayDeque<Int>()
+    private val autoNext = Runnable { autoStep() }
+
     var state: GameState? = null
         private set
     private val level: Level? get() = state?.level
@@ -109,10 +115,30 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         level?.let { setLevel(it) }
     }
 
+    /** Restart the level and play its stored solution move by move. */
+    fun playSolution() {
+        val lv = level ?: return
+        if (lv.solution.isEmpty()) return
+        setLevel(lv)
+        autoQueue.clear(); autoQueue.addAll(lv.solution)
+        isAutoPlaying = true
+        postDelayed(autoNext, 600)
+    }
+
+    private fun autoStep() {
+        if (!isAutoPlaying) return
+        val color = autoQueue.removeFirstOrNull()
+        if (color == null || state?.status != Status.PLAYING) { isAutoPlaying = false; return }
+        startTip(color)
+    }
+
     private fun cancelAnimations() {
         tipAnim?.cancel(); tipAnim = null
         spinAnim?.cancel(); spinAnim = null
         tipColor = -1; spinAngle = 0f; bumpT = 0f
+        removeCallbacks(autoNext)
+        autoQueue.clear()
+        isAutoPlaying = false
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -410,7 +436,7 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     private fun handleTap(x: Float, y: Float) {
         val st = state ?: return
-        if (st.status != Status.PLAYING || tipAnim != null || spinAnim != null) return
+        if (st.status != Status.PLAYING || tipAnim != null || spinAnim != null || isAutoPlaying) return
         val bx = (x - ox) / scale
         val by = (oy - y) / scale
         for (color in st.legalMoves()) {
@@ -481,14 +507,22 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 addListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         spinAnim = null; spinAngle = 0f; invalidate()
-                        listener?.onMoved(next)
+                        afterMove(next)
                     }
                 })
             }
             spinAnim = anim
             anim.start()
         } else {
-            listener?.onMoved(next)
+            afterMove(next)
+        }
+    }
+
+    private fun afterMove(next: GameState) {
+        listener?.onMoved(next)
+        if (isAutoPlaying) {
+            if (autoQueue.isEmpty() || next.status != Status.PLAYING) isAutoPlaying = false
+            else postDelayed(autoNext, 450)
         }
     }
 

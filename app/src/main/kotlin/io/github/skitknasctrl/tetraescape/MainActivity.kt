@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
     private var level: Level? = null
     private var difficulty = 1
     private var finished = false
+    private var replayShown = false
     private var dialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,6 +106,7 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
         timer?.cancel(); timer = null
         level = lvl
         finished = false
+        replayShown = false
         timeLeftMs = lvl.timeSeconds * 1000L
         gameView.setLevel(lvl)
         levelView.text = getString(R.string.level_seed, lvl.seed, difficultyName(lvl.difficulty))
@@ -124,6 +126,7 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
 
     override fun onFirstMove() {
         val lvl = level ?: return
+        if (gameView.isAutoPlaying) return
         timer?.cancel()
         timer = object : CountDownTimer(lvl.timeSeconds * 1000L, 100) {
             override fun onTick(ms: Long) {
@@ -148,6 +151,11 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
             Status.WON -> {
                 finished = true
                 timer?.cancel()
+                if (gameView.isAutoPlaying || replayShown) {
+                    replayShown = false
+                    showEnd(getString(R.string.solution_title), getString(R.string.solution_done, state.moves), won = false)
+                    return
+                }
                 val secs = (timeLeftMs / 1000).toInt()
                 showEnd(getString(R.string.won_title), getString(R.string.won_message, state.moves, secs), won = true)
             }
@@ -179,8 +187,21 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
         } else {
             b.setPositiveButton(R.string.retry) { _, _ -> startLevel(lvl) }
             b.setNegativeButton(R.string.new_level) { _, _ -> newLevel(randomSeed()) }
+            if (lvl.solution.isNotEmpty() && !gameView.isAutoPlaying && gameView.state?.status != Status.WON) {
+                b.setNeutralButton(R.string.show_solution) { _, _ -> showSolution() }
+            }
         }
         dialog = b.show()
+    }
+
+    private fun showSolution() {
+        val lvl = level ?: return
+        dialog?.dismiss()
+        timer?.cancel(); timer = null
+        startLevel(lvl)
+        replayShown = true
+        levelView.text = getString(R.string.solution_playing)
+        gameView.playSolution()
     }
 
     private fun showHelp() {
@@ -189,6 +210,7 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
             .setTitle(R.string.rules_title)
             .setMessage(R.string.rules_text)
             .setPositiveButton(android.R.string.ok, null)
+            .setNeutralButton(R.string.show_solution) { _, _ -> showSolution() }
             .show()
     }
 

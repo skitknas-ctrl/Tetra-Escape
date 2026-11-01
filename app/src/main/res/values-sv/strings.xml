@@ -20,6 +20,10 @@
     <string name="share_text">Jag klarade Tetra-Escape bana %1$d (nivå %2$d) på %3$d drag med %4$d s kvar.</string>
     <string name="enter_seed_title">Spela en viss bana</string>
     <string name="enter_seed_hint">Bananummer</string>
+    <string name="show_solution">Visa lösning</string>
+    <string name="solution_title">Lösning</string>
+    <string name="solution_playing">Spelar upp lösningen…</string>
+    <string name="solution_done">Det var lösningen, %1$d drag. Din tur?</string>
     <string name="rules_title">Så spelar du</string>
     <string name="rules_text">Välta glastetraedern till en intilliggande trekant genom att trycka på den. Pjäsen glider inte – den rullar över en kant, så symbolen som hamnar nedåt ändras vid varje drag.\n\nTa dig till guldrutan innan stegen tar slut.\n\nBlå rutor ger extra steg – men bara om symbolen som ligger nedåt är den som visas i rutan. Utan dem når du inte målet.\n\nLila rutor vrider pjäsen ett tredjedels varv varje gång du landar där.\n\nVisar målet en symbol måste du komma dit med just den symbolen nedåt.\n\nDe svaga symbolerna i grannrutorna visar vad som skulle hamna nedåt där. Tiden startar vid ditt första drag.</string>
 </resources>
