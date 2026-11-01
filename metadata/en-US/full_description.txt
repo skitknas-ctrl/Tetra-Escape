@@ -1,0 +1,7 @@
+Tetra-Escape is a puzzle game on a board of triangles. Your piece is a transparent tetrahedron with a symbol on each face. It never slides: every move tips it over one of its edges onto a neighbouring triangle, so the symbol lying on the board changes with every move.
+
+Reach the goal before your steps run out. Bonus cells give extra steps, but only if you arrive with the right symbol down, and you cannot reach the goal without them. Spin cells rotate the piece a third of a turn. Some goals demand a particular symbol too. All of this against the clock.
+
+Levels are generated at random from a level number, checked by a built-in solver so that every level can be finished, and can be shared by number.
+
+Free software, no ads, no tracking, no network access.

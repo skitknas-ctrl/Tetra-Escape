@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="steps_label">Steg</string>
+    <string name="time_label">Tid</string>
+    <string name="new_level">Ny bana</string>
+    <string name="retry">Om igen</string>
+    <string name="difficulty_easy">Lätt</string>
+    <string name="difficulty_medium">Medel</string>
+    <string name="difficulty_hard">Svår</string>
+    <string name="level_seed">Bana %1$d</string>
+    <string name="timer_hint">Tiden startar vid första draget</string>
+    <string name="won_title">Du kom ut!</string>
+    <string name="won_message">%1$d drag, %2$d s kvar.</string>
+    <string name="lost_steps_title">Slut på steg</string>
+    <string name="lost_time_title">Tiden är ute</string>
+    <string name="lost_message">Försök igen?</string>
+    <string name="next_level">Nästa bana</string>
+    <string name="share">Dela</string>
+    <string name="share_text">Jag klarade Tetra-Escape bana %1$d (nivå %2$d) på %3$d drag med %4$d s kvar.</string>
+    <string name="enter_seed_title">Spela en viss bana</string>
+    <string name="enter_seed_hint">Bananummer</string>
+    <string name="rules_title">Så spelar du</string>
+    <string name="rules_text">Välta glastetraedern till en intilliggande trekant genom att trycka på den. Pjäsen glider inte – den rullar över en kant, så symbolen som hamnar nedåt ändras vid varje drag.\n\nTa dig till guldrutan innan stegen tar slut.\n\nBlå rutor ger extra steg – men bara om symbolen som ligger nedåt är den som visas i rutan. Utan dem når du inte målet.\n\nLila rutor vrider pjäsen ett tredjedels varv varje gång du landar där.\n\nVisar målet en symbol måste du komma dit med just den symbolen nedåt.\n\nDe svaga symbolerna i grannrutorna visar vad som skulle hamna nedåt där. Tiden startar vid ditt första drag.</string>
+</resources>

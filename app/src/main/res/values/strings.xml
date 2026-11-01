@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tetra-Escape</string>
+    <string name="steps_label">Steps</string>
+    <string name="time_label">Time</string>
+    <string name="time_value">%1$d s</string>
+    <string name="new_level">New level</string>
+    <string name="retry">Retry</string>
+    <string name="help">?</string>
+    <string name="generating">…</string>
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_medium">Medium</string>
+    <string name="difficulty_hard">Hard</string>
+    <string name="level_seed">Level %1$d</string>
+    <string name="timer_hint">Timer starts on your first move</string>
+    <string name="won_title">You escaped!</string>
+    <string name="won_message">%1$d moves, %2$d s to spare.</string>
+    <string name="lost_steps_title">Out of steps</string>
+    <string name="lost_time_title">Time is up</string>
+    <string name="lost_message">Try again?</string>
+    <string name="next_level">Next level</string>
+    <string name="share">Share</string>
+    <string name="share_text">I escaped Tetra-Escape level %1$d (difficulty %2$d) in %3$d moves with %4$d s to spare.</string>
+    <string name="enter_seed_title">Play a specific level</string>
+    <string name="enter_seed_hint">Level number</string>
+    <string name="rules_title">How to play</string>
+    <string name="rules_text">Tip the glass tetrahedron onto a neighbouring triangle by tapping it. It does not slide – it rolls over an edge, so the symbol that ends up on the bottom changes with every move.\n\nReach the gold goal before you run out of steps.\n\nBlue cells give extra steps – but only if the symbol lying on the bottom is the one shown in the cell. You will not reach the goal without them.\n\nPurple cells spin the piece a third of a turn every time you land on them.\n\nIf the goal shows a symbol, you must arrive with that symbol on the bottom.\n\nThe faint symbols in the neighbouring cells show what would land there. The timer starts on your first move.</string>
+</resources>

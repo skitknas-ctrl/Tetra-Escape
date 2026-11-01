@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/steps_label"
+                android:textColor="@color/ink_soft"
+                android:textSize="13sp" />
+            <TextView
+                android:id="@+id/steps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/ink"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/time_label"
+                android:textColor="@color/ink_soft"
+                android:textSize="13sp" />
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/ink"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/accent"
+                android:textSize="14sp"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackground" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/timer_hint"
+                android:textColor="@color/ink_soft"
+                android:textSize="11sp"
+                android:gravity="center" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <io.github.skitknasctrl.tetraescape.ui.GameView
+        android:id="@+id/game"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <RadioGroup
+        android:id="@+id/difficulty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <RadioButton android:id="@+id/diff1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/difficulty_easy" android:textColor="@color/ink" />
+        <RadioButton android:id="@+id/diff2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/difficulty_medium" android:textColor="@color/ink" android:layout_marginStart="12dp" />
+        <RadioButton android:id="@+id/diff3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/difficulty_hard" android:textColor="@color/ink" android:layout_marginStart="12dp" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/newLevel"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/new_level" />
+        <Button
+            android:id="@+id/retry"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/retry" />
+        <Button
+            android:id="@+id/help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/help" />
+    </LinearLayout>
+</LinearLayout>
