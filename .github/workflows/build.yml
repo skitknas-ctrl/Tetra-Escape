@@ -43,7 +43,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: 0.1.0-test.${{ github.run_number }}
         run: |
-          for old in $(gh release list --limit 100 --json tagName --jq '.[].tagName' | grep -E '^testbuild$|-test\.[0-9]+$' || true); do
+          # keep the three newest test releases so a client that already fetched the release list
+          # (Obtainium, a browser tab) can still download; delete the rest
+          for old in $(gh release list --limit 100 --json tagName --jq '.[].tagName' | grep -E '^testbuild$|-test\.[0-9]+$' | sort -t. -k4,4n -r | tail -n +3 || true); do
             gh release delete "$old" --cleanup-tag --yes || true
           done
           gh release create "$VERSION" tetra-escape-debug.apk \
