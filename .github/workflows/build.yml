@@ -24,7 +24,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Unit tests and debug APK
-        run: ./gradlew --no-daemon test assembleDebug
+        run: ./gradlew --no-daemon -PbuildNumber=${{ github.run_number }} test assembleDebug
 
       - name: Collect APK
         run: cp app/build/outputs/apk/debug/app-debug.apk tetra-escape-debug.apk
@@ -34,18 +34,22 @@ jobs:
           name: tetra-escape-debug
           path: tetra-escape-debug.apk
 
-      # Rolling pre-release "testbuild": always the latest APK from main, with a stable download URL:
-      # https://github.com/${{ github.repository }}/releases/download/testbuild/tetra-escape-debug.apk
-      - name: Publish rolling test build
+      # Rolling test release: a new tag per build (0.1.0-test.<n>) so that Obtainium sees every
+      # build as a new version; older test releases are removed. Stable download URL:
+      # https://github.com/${{ github.repository }}/releases/latest/download/tetra-escape-debug.apk
+      - name: Publish test build
         if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: 0.1.0-test.${{ github.run_number }}
         run: |
-          gh release delete testbuild --cleanup-tag --yes || true
-          gh release create testbuild tetra-escape-debug.apk \
-            --prerelease \
-            --title "Testbygge (senaste från main)" \
-            --notes "Automatiskt bygge av commit ${GITHUB_SHA::7}. Signerat med test-nyckeln, går att uppdatera ovanpå tidigare testbyggen."
+          for old in $(gh release list --limit 100 --json tagName --jq '.[].tagName' | grep -E '^testbuild$|-test\.[0-9]+$' || true); do
+            gh release delete "$old" --cleanup-tag --yes || true
+          done
+          gh release create "$VERSION" tetra-escape-debug.apk \
+            --latest \
+            --title "Testbygge $VERSION" \
+            --notes "Automatiskt bygge av commit ${GITHUB_SHA::7}. Signerat med test-nyckeln; kan installeras ovanpå tidigare testbyggen."
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')

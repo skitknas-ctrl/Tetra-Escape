@@ -18,9 +18,11 @@ Projektet byggs med Gradle och Android SDK. Ingen Android Studio behövs.
 
     ./gradlew assembleDebug
 
-GitHub Actions bygger en test-APK vid varje push till `main` och publicerar den som förhandsutgåvan **testbuild**:
+GitHub Actions bygger en test-APK vid varje push till `main` och publicerar den som utgåvan `0.1.0-test.<byggnummer>` (äldre testutgåvor tas bort). Senaste bygget finns alltid här:
 
-    https://github.com/skitknas-ctrl/Tetra-Escape/releases/download/testbuild/tetra-escape-debug.apk
+    https://github.com/skitknas-ctrl/Tetra-Escape/releases/latest/download/tetra-escape-debug.apk
+
+Med Obtainium: lägg till `https://github.com/skitknas-ctrl/Tetra-Escape`, inga extra inställningar behövs.
 
 Testbyggen signeras med nyckeln i `app/debug.keystore` (endast för test) så att de kan installeras ovanpå varandra. Riktiga utgåvor (taggar `v*`) signeras med en nyckel som lämnas via GitHub Secrets: `RELEASE_KEYSTORE_BASE64`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD`.
 

@@ -13,8 +13,11 @@ android {
         applicationId = "io.github.skitknasctrl.tetraescape"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        // CI passes -PbuildNumber=<run number>; test builds are then versioned 0.1.0-test.<n>
+        val baseVersion = "0.1.0"
+        val buildNumber = (project.findProperty("buildNumber") as String?)?.toIntOrNull()
+        versionCode = buildNumber ?: 1
+        versionName = if (buildNumber != null) "$baseVersion-test.$buildNumber" else "$baseVersion-dev"
     }
 
     signingConfigs {
@@ -39,8 +42,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
+            applicationIdSuffix = ".debug" // test app installs alongside the real release
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
