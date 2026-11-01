@@ -82,6 +82,7 @@ class EngineTest {
             assertTrue("bonus must be needed seed=$seed d=$d", noBonus == null || noBonus > lvl.steps)
             assertNotNull(Solver.shortestSolution(lvl))
             assertTrue(lvl.timeSeconds > 0)
+            assertNotNull("goal must demand a symbol seed=$seed d=$d", lvl.goalRequirement())
         }
     }
 

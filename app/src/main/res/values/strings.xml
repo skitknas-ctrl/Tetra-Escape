@@ -11,7 +11,8 @@
     <string name="difficulty_easy">Easy</string>
     <string name="difficulty_medium">Medium</string>
     <string name="difficulty_hard">Hard</string>
-    <string name="level_seed">Level %1$d</string>
+    <string name="level_seed">Level no. %1$d · %2$s</string>
+    <string name="level_info">Level no. %1$d, difficulty %2$s</string>
     <string name="timer_hint">Timer starts on your first move</string>
     <string name="won_title">You escaped!</string>
     <string name="won_message">%1$d moves, %2$d s to spare.</string>

@@ -97,10 +97,14 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
         finished = false
         timeLeftMs = lvl.timeSeconds * 1000L
         gameView.setLevel(lvl)
-        levelView.text = getString(R.string.level_seed, lvl.seed)
+        levelView.text = getString(R.string.level_seed, lvl.seed, difficultyName(lvl.difficulty))
         updateHud(gameView.state!!)
         timeView.text = getString(R.string.time_value, lvl.timeSeconds)
     }
+
+    private fun difficultyName(d: Int): String = getString(
+        when (d) { 2 -> R.string.difficulty_medium; 3 -> R.string.difficulty_hard; else -> R.string.difficulty_easy }
+    )
 
     private fun updateHud(st: GameState) {
         stepsView.text = st.stepsLeft.toString()
@@ -148,7 +152,8 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
 
     private fun showEnd(title: String, message: String, won: Boolean) {
         val lvl = level ?: return
-        val b = AlertDialog.Builder(this).setTitle(title).setMessage(message).setCancelable(true)
+        val info = getString(R.string.level_info, lvl.seed, difficultyName(lvl.difficulty))
+        val b = AlertDialog.Builder(this).setTitle(title).setMessage(message + "\n\n" + info).setCancelable(true)
         if (won) {
             b.setPositiveButton(R.string.next_level) { _, _ -> newLevel(randomSeed()) }
             b.setNeutralButton(R.string.share) { _, _ ->

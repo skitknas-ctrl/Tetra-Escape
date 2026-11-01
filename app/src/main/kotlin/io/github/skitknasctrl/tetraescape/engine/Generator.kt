@@ -10,7 +10,8 @@ import kotlin.random.Random
  *  - it must be solvable,
  *  - the bonus steps must be necessary (not solvable with the same budget if bonuses are ignored),
  *  - the shortest solution must have a length that fits the difficulty,
- *  - from difficulty 2 the shortest solution must pass at least one spin cell.
+ *  - from difficulty 2 the shortest solution must pass at least one spin cell,
+ *  - the goal always demands a specific symbol.
  */
 object Generator {
 
@@ -30,9 +31,9 @@ object Generator {
     )
 
     fun params(difficulty: Int): Params = when (difficulty.coerceIn(1, 3)) {
-        1 -> Params(4, 4, 0.12, 1..2, 1..2, 2..3, 6..10, 1, false, 0.0, 25, 4.0)
-        2 -> Params(5, 5, 0.18, 2..3, 2..3, 2..4, 9..14, 0, true, 0.3, 20, 3.0)
-        else -> Params(6, 6, 0.22, 3..3, 3..4, 2..4, 12..20, 0, true, 0.6, 15, 2.5)
+        1 -> Params(4, 4, 0.12, 1..2, 1..2, 2..3, 6..10, 1, false, 1.0, 25, 4.0)
+        2 -> Params(5, 5, 0.18, 2..3, 2..3, 2..4, 9..14, 0, true, 1.0, 20, 3.0)
+        else -> Params(6, 6, 0.22, 3..3, 3..4, 2..4, 12..20, 0, true, 1.0, 15, 2.5)
     }
 
     fun generate(seed: Long, difficulty: Int, maxAttempts: Int = 400): Level {

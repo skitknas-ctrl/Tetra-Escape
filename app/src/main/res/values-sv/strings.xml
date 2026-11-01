@@ -7,7 +7,8 @@
     <string name="difficulty_easy">Lätt</string>
     <string name="difficulty_medium">Medel</string>
     <string name="difficulty_hard">Svår</string>
-    <string name="level_seed">Bana %1$d</string>
+    <string name="level_seed">Bana nr %1$d · %2$s</string>
+    <string name="level_info">Bana nr %1$d, nivå %2$s</string>
     <string name="timer_hint">Tiden startar vid första draget</string>
     <string name="won_title">Du kom ut!</string>
     <string name="won_message">%1$d drag, %2$d s kvar.</string>
