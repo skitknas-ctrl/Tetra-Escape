@@ -6,6 +6,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
@@ -222,9 +223,13 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         if (sp.bonus > 0) {
             val ink = if (collected) usedInk else bonusInk
             val inkFill = if (collected) usedInkFill else bonusInkFill
-            sp.require?.let { drawSymbolInCell(canvas, c, it, ink, inkFill) }
+            // symbol in the upper (apex) part, the number near the wide base – no overlap
+            sp.require?.let { drawSymbolInCell(canvas, c, it, ink, inkFill, shift = 0.14f, size = 0.78f) }
+            val pt = floatArrayOf(SymbolPaths.CX, 0.13f)
+            cellMatrix(c).mapPoints(pt)
             text.color = ink.color
-            canvas.drawText("+${sp.bonus}", scx, scy + towardWide * scale * 0.18f + text.textSize * 0.35f, text)
+            text.textSize = scale * 0.17f
+            canvas.drawText("+${sp.bonus}", pt[0], pt[1] + text.textSize * 0.36f, text)
         }
         if (sp.spin != 0) {
             drawSpinArrow(canvas, scx, scy, sp.spin > 0, if (sp.bonus > 0) scale * 0.13f else scale * 0.2f, towardWide, sp.bonus > 0)
@@ -255,15 +260,28 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         canvas.drawPath(path, fillP)
     }
 
-    private fun drawSymbolInCell(canvas: Canvas, c: Cell, s: Symbol, ink: Paint, inkFill: Paint) {
+    /** Matrix from the canonical face triangle onto this cell on screen. */
+    private fun cellMatrix(c: Cell): Matrix {
         val pts = c.corners
-        val m = SymbolPaths.faceMatrix(
+        return SymbolPaths.faceMatrix(
             sx(Cell.ptX(pts[0])), sy(Cell.ptY(pts[0])),
             sx(Cell.ptX(pts[1])), sy(Cell.ptY(pts[1])),
             sx(Cell.ptX(pts[2])), sy(Cell.ptY(pts[2])),
         )
+    }
+
+    /**
+     * Draw a symbol in a cell. [shift] moves it from the centroid towards the cell's apex
+     * (canonical units), [size] scales it about its own centre.
+     */
+    private fun drawSymbolInCell(canvas: Canvas, c: Cell, s: Symbol, ink: Paint, inkFill: Paint, shift: Float = 0f, size: Float = 1f) {
+        val m = cellMatrix(c)
         canvas.save()
         canvas.concat(m)
+        if (shift != 0f || size != 1f) {
+            canvas.translate(0f, shift)
+            canvas.scale(size, size, SymbolPaths.CX, SymbolPaths.CY)
+        }
         val strokeW = ink.strokeWidth
         ink.strokeWidth = strokeW / scale
         SymbolPaths.stroke[s]?.let { canvas.drawPath(it, ink) }

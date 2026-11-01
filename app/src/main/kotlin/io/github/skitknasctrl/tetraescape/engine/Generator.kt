@@ -31,9 +31,10 @@ object Generator {
     )
 
     fun params(difficulty: Int): Params = when (difficulty.coerceIn(1, 3)) {
-        1 -> Params(4, 4, 0.12, 1..2, 1..2, 2..3, 6..10, 1, false, 1.0, 25, 4.0)
-        2 -> Params(5, 5, 0.18, 2..3, 2..3, 2..4, 9..14, 0, true, 1.0, 20, 3.0)
-        else -> Params(6, 6, 0.22, 3..3, 3..4, 2..4, 12..20, 0, true, 1.0, 15, 2.5)
+        // tall boards (rows > cols) to fill a portrait phone screen; start at the bottom, goal at the top
+        1 -> Params(6, 3, 0.12, 1..2, 1..2, 2..3, 7..11, 1, false, 1.0, 25, 4.0)
+        2 -> Params(8, 4, 0.18, 2..3, 2..3, 2..4, 10..16, 0, true, 1.0, 20, 3.0)
+        else -> Params(10, 5, 0.22, 3..4, 3..4, 2..4, 14..22, 0, true, 1.0, 15, 2.5)
     }
 
     fun generate(seed: Long, difficulty: Int, maxAttempts: Int = 400): Level {
@@ -56,11 +57,11 @@ object Generator {
     private fun candidate(rnd: Random, p: Params, seed: Long, difficulty: Int): Level? {
         val base = Level(p.rows, p.cols, emptySet(), Cell(0, 0, true), Cell(0, 0, true), emptyMap(), 0, 0, seed, difficulty)
         val all = base.allCells
-        // start on the left part, goal on the right part
-        val leftish = all.filter { it.i - base.i0(it.j) < p.cols / 2 }
-        val rightish = all.filter { it.i - base.i0(it.j) >= (p.cols + 1) / 2 }
-        val start = leftish.random(rnd)
-        val goal = rightish.random(rnd)
+        // start in the bottom third, goal in the top third
+        val bottom = all.filter { it.j < p.rows / 3 }
+        val top = all.filter { it.j >= p.rows - p.rows / 3 }
+        val start = bottom.random(rnd)
+        val goal = top.random(rnd)
         val holes = HashSet<Cell>()
         val nHoles = (all.size * p.holeFraction).toInt()
         val pool = all.filter { it != start && it != goal }.shuffled(rnd)
