@@ -112,6 +112,6 @@ class EngineTest {
         val b = Generator.generate(42, 2)
         assertEquals(a.specials, b.specials)
         assertEquals(a.solution, b.solution)
-        assertEquals(a.steps, b.steps)
+        assertEquals(a.par, b.par)
     }
 }
