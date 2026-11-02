@@ -5,6 +5,7 @@
     <string name="keys_value">Nycklar %1$d/%2$d</string>
     <string name="new_level">Ny bana</string>
     <string name="retry">Om igen</string>
+    <string name="undo">Ångra</string>
     <string name="difficulty_easy">Lätt</string>
     <string name="difficulty_medium">Medel</string>
     <string name="difficulty_hard">Svår</string>
@@ -26,5 +27,5 @@
     <string name="difficulty">Svårighetsgrad</string>
     <string name="preview_option">Visa vilken symbol som hamnar i grannrutorna</string>
     <string name="rules_title">Så spelar du</string>
-    <string name="rules_text">Välta glastetraedern till en intilliggande trekant genom att trycka på den. Pjäsen glider inte – den rullar över en kant, så symbolen som hamnar nedåt ändras vid varje drag.\n\nSamla nycklarna i ordning (1, 2, 3 …). En nyckel tas bara när du landar på den med symbolen i rutan nedåt.\n\nMålet är låst tills du har alla nycklar, och kräver dessutom en viss symbol nedåt.\n\nLila rutor vrider pjäsen ett tredjedels varv varje gång du landar där. Rutor med ringar är portaler: landar du på en flyttas du till dess tvilling.\n\nIngen tidsgräns och ingen steggräns. Kortet högst upp visar det minsta antal drag banan kan klaras på – försök matcha det. De svaga symbolerna i grannrutorna visar vad som skulle hamna nedåt där.</string>
+    <string name="rules_text">Välta glastetraedern till en intilliggande trekant genom att trycka på den. Pjäsen glider inte – den rullar över en kant, så symbolen som hamnar nedåt ändras vid varje drag.\n\nSamla nycklarna i ordning (1, 2, 3 …). En nyckel tas bara när du landar på den med symbolen i rutan nedåt.\n\nMålet är låst tills du har alla nycklar, och kräver dessutom en viss symbol nedåt.\n\nLila rutor vrider pjäsen ett tredjedels varv varje gång du landar där. Rutor med ringar är portaler: landar du på en flyttas du till dess tvilling.\n\nIngen tidsgräns och ingen steggräns. Kortet högst upp visar det minsta antal drag banan kan klaras på – försök matcha det. De svaga symbolerna i grannrutorna visar vad som skulle hamna nedåt där.\n\nKnappar: grön = ny bana, blå = ångra (håll inne för att börja om banan), röd = den här hjälpen, guld = inställningar.</string>
 </resources>

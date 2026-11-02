@@ -6,6 +6,7 @@
     <string name="keys_value">Keys %1$d/%2$d</string>
     <string name="new_level">New level</string>
     <string name="retry">Retry</string>
+    <string name="undo">Undo</string>
     <string name="help">?</string>
     <string name="generating">…</string>
     <string name="difficulty_easy">Easy</string>
@@ -29,5 +30,5 @@
     <string name="difficulty">Difficulty</string>
     <string name="preview_option">Show which symbol would land in each neighbouring cell</string>
     <string name="rules_title">How to play</string>
-    <string name="rules_text">Tip the glass tetrahedron onto a neighbouring triangle by tapping it. It does not slide – it rolls over an edge, so the symbol that ends up on the bottom changes with every move.\n\nCollect the keys in order (1, 2, 3 …). A key is only taken when you land on it with the symbol shown in the cell on the bottom.\n\nThe goal is locked until you have every key, and it also wants a particular symbol on the bottom.\n\nPurple cells spin the piece a third of a turn every time you land on them. Ringed cells are portals: landing on one moves you to its twin.\n\nThere is no time limit and no step limit. The card at the top shows the fewest moves the level can be done in – try to match it. The faint symbols in the neighbouring cells show what would land there.</string>
+    <string name="rules_text">Tip the glass tetrahedron onto a neighbouring triangle by tapping it. It does not slide – it rolls over an edge, so the symbol that ends up on the bottom changes with every move.\n\nCollect the keys in order (1, 2, 3 …). A key is only taken when you land on it with the symbol shown in the cell on the bottom.\n\nThe goal is locked until you have every key, and it also wants a particular symbol on the bottom.\n\nPurple cells spin the piece a third of a turn every time you land on them. Ringed cells are portals: landing on one moves you to its twin.\n\nThere is no time limit and no step limit. The card at the top shows the fewest moves the level can be done in – try to match it. The faint symbols in the neighbouring cells show what would land there.\n\nButtons: green = new level, blue = undo (hold to restart the level), red = this help, gold = settings.</string>
 </resources>

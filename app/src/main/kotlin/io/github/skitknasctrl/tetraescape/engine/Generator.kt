@@ -26,9 +26,10 @@ object Generator {
     )
 
     fun params(difficulty: Int): Params = when (difficulty.coerceIn(1, 3)) {
-        1 -> Params(6, 3, 1, 1..2, 0..0, 8..14, 1, false)
-        2 -> Params(8, 4, 2, 2..3, 1..1, 14..24, 2, true)
-        else -> Params(10, 5, 3, 3..4, 1..2, 24..40, 2, true)
+        // few, large cells: the board is scaled to the screen width, so cell size is set by cols
+        1 -> Params(5, 2, 1, 1..2, 0..0, 6..12, 1, false)
+        2 -> Params(6, 2, 2, 2..3, 1..1, 12..20, 2, true)
+        else -> Params(7, 3, 3, 3..4, 1..2, 20..32, 2, true)
     }
 
     fun generate(seed: Long, difficulty: Int, maxAttempts: Int = 500): Level {

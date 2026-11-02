@@ -84,7 +84,7 @@
             android:orientation="horizontal"
             android:gravity="center">
             <ImageButton android:id="@+id/newLevel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="84dp" android:src="@drawable/gem_green" android:background="@drawable/glow_green" android:scaleType="fitCenter" android:padding="8dp" android:contentDescription="@string/new_level" />
-            <ImageButton android:id="@+id/retry" android:layout_width="0dp" android:layout_weight="1" android:layout_height="84dp" android:src="@drawable/gem_blue" android:background="@drawable/glow_blue" android:scaleType="fitCenter" android:padding="8dp" android:contentDescription="@string/retry" />
+            <ImageButton android:id="@+id/retry" android:layout_width="0dp" android:layout_weight="1" android:layout_height="84dp" android:src="@drawable/gem_blue" android:background="@drawable/glow_blue" android:scaleType="fitCenter" android:padding="8dp" android:contentDescription="@string/undo" />
             <ImageButton android:id="@+id/help" android:layout_width="0dp" android:layout_weight="1" android:layout_height="84dp" android:src="@drawable/gem_red" android:background="@drawable/glow_red" android:scaleType="fitCenter" android:padding="8dp" android:contentDescription="@string/rules_title" />
             <ImageButton android:id="@+id/settings" android:layout_width="0dp" android:layout_weight="1" android:layout_height="84dp" android:src="@drawable/gem_gold" android:background="@drawable/glow_gold" android:scaleType="fitCenter" android:padding="8dp" android:contentDescription="@string/settings" />
         </LinearLayout>

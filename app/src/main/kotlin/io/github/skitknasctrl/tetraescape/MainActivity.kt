@@ -61,7 +61,10 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
         difficulty = prefs.getInt("difficulty", 1)
         gameView.showPreview = prefs.getBoolean("preview", true)
         findViewById<View>(R.id.newLevel).setOnClickListener { newLevel(randomSeed()) }
-        findViewById<View>(R.id.retry).setOnClickListener { level?.let { startLevel(it) } }
+        findViewById<View>(R.id.retry).apply {
+            setOnClickListener { gameView.undo() }
+            setOnLongClickListener { level?.let { startLevel(it) }; true }
+        }
         findViewById<View>(R.id.help).setOnClickListener { showHelp() }
         findViewById<View>(R.id.settings).setOnClickListener { showSettings() }
         levelView.setOnClickListener { askForSeed() }
@@ -120,6 +123,7 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
 
     override fun onMoved(state: GameState) {
         updateHud(state)
+        if (state.status == Status.PLAYING) { finished = false; return }
         if (finished) return
         if (state.status == Status.WON) {
             finished = true
@@ -133,7 +137,12 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
                 state.moves <= lvl.par -> getString(R.string.won_perfect, state.moves)
                 else -> getString(R.string.won_message, state.moves, lvl.par)
             }
-            showEnd(getString(R.string.won_title), msg, won = true)
+            val stars = when {
+                state.moves <= lvl.par -> "★★★"
+                state.moves <= lvl.par + 2 -> "★★☆"
+                else -> "★☆☆"
+            }
+            showEnd(stars + "  " + getString(R.string.won_title), msg, won = true)
         }
     }
 

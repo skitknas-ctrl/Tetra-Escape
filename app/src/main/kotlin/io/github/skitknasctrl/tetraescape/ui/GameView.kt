@@ -49,6 +49,9 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     var isAutoPlaying = false
         private set
     private val autoQueue = ArrayDeque<Int>()
+    /** Previous states, for undo. */
+    private val history = ArrayList<GameState>()
+    val canUndo: Boolean get() = history.isNotEmpty() && tipAnim == null && spinAnim == null && !isAutoPlaying
     private val autoNext = Runnable { autoStep() }
 
     var state: GameState? = null
@@ -125,8 +128,18 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         cancelAnimations()
         state = GameState.start(level)
         pendingState = null
+        history.clear()
         computeLayout()
         invalidate()
+    }
+
+    /** Take back the last move. Returns false if there is nothing to undo right now. */
+    fun undo(): Boolean {
+        if (!canUndo) return false
+        state = history.removeAt(history.size - 1)
+        invalidate()
+        listener?.onMoved(state!!)
+        return true
     }
 
     fun restart() {
@@ -602,6 +615,7 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         tipColor = -1
         val next = pendingState ?: return
         pendingState = null
+        state?.let { history.add(it) }
         state = next
         invalidate()
         val spun = next.lastEffect.spun
