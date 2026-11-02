@@ -1,6 +1,6 @@
 Tetra-Escape är ett pusselspel på ett bräde av trekanter. Pjäsen är en genomskinlig tetraeder med en symbol på varje sida. Den glider aldrig: varje drag välter den över en kant till en intilliggande trekant, så symbolen som ligger mot brädet ändras vid varje drag.
 
-Nå målet innan stegen tar slut. Bonusrutor ger extra steg, men bara om du kommer dit med rätt symbol nedåt, och utan dem når du inte målet. Snurrutor vrider pjäsen ett tredjedels varv. Vissa mål kräver också en viss symbol. Allt på tid.
+Samla nycklarna i ordning – var och en bara när du kommer dit med rätt symbol nedåt – och nå sedan målet med den symbol det kräver. Snurrutor vrider pjäsen, portaler flyttar den över brädet. Ingen klocka och ingen steggräns: appen visar det minsta antal drag banan kan klaras på, och utmaningen är att matcha det.
 
 Banorna slumpas fram ur ett bananummer, kontrolleras av en inbyggd lösare så att varje bana går att klara, och kan delas via numret.
 

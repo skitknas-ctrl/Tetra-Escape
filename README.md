@@ -5,12 +5,12 @@ Pusselspel för Android: välta en genomskinlig tetraeder över ett bräde av tr
 ## Spelregler
 
 - Pjäsen glider inte, den välts över en kant till en av de tre grannrutorna. Symbolen som ligger nedåt ändras därför vid varje drag.
-- Blå rutor ger extra steg, men bara om rätt symbol ligger nedåt. Utan bonusstegen räcker inte stegen till målet.
-- Lila rutor vrider pjäsen ett tredjedels varv.
-- Guldrutan är målet. Visar den en symbol måste du komma dit med den symbolen nedåt.
-- Tiden startar vid första draget.
+- Samla nycklarna i ordning. En nyckel tas bara när du landar på den med rätt symbol nedåt.
+- Målet är låst tills alla nycklar är tagna, och kräver dessutom en viss symbol nedåt.
+- Lila rutor vrider pjäsen ett tredjedels varv. Portaler (ringar) flyttar pjäsen till sin tvilling.
+- Ingen tidsgräns, ingen steggräns. Appen visar det minsta antal drag banan kan klaras på; målet är att matcha det.
 
-Banorna genereras slumpmässigt ur ett bananummer och kontrolleras av en inbyggd lösare: varje bana går att klara, bonusstegen behövs, och svårighetsgraden mäts i antal drag.
+Banorna genereras slumpmässigt ur ett bananummer och kontrolleras av en inbyggd lösare: varje bana går att klara, symbolkraven gör skillnad, och svårighetsgraden mäts i minsta antal drag.
 
 ## Bygga
 

@@ -1,51 +1,53 @@
 package io.github.skitknasctrl.tetraescape.engine
 
-enum class Status { PLAYING, WON, LOST }
+enum class Status { PLAYING, WON }
 
-/** What happened when the piece landed on a cell — used for feedback/animation. */
+/** What happened when the piece landed — used for feedback/animation. */
 data class LandingEffect(
-    val bonusGained: Int = 0,
+    val keyTaken: Int = 0,
     val spun: Int = 0,
+    /** Set when a portal moved the piece: the cell it came out of. */
+    val portalFrom: Cell? = null,
+    /** Landed on the next key (or the goal) with the wrong symbol down. */
     val requirementFailed: Boolean = false,
 )
 
 /**
- * The rules applied when the piece lands on [cell] with orientation [orient].
+ * The rules applied when the piece lands on [cell] with orientation [orient] holding [keys] keys.
  * Shared by the game and the solver so they can never disagree.
  */
 object Rules {
-    data class Landing(val orient: Int, val stepsLeft: Int, val mask: Int, val effect: LandingEffect, val won: Boolean)
+    data class Landing(val cell: Cell, val orient: Int, val keys: Int, val effect: LandingEffect, val won: Boolean)
 
-    fun land(level: Level, cell: Cell, orient: Int, stepsLeft: Int, mask: Int, ignoreBonus: Boolean = false): Landing {
+    fun land(level: Level, landed: Cell, orient: Int, keys: Int, ignoreRequire: Boolean = false): Landing {
+        var cell = landed
+        var portalFrom: Cell? = null
+        level.portalPartner(cell)?.let { portalFrom = cell; cell = it }
         val sp = level.specials[cell]
         var o = orient
-        var s = stepsLeft
-        var m = mask
-        var gained = 0
+        var k = keys
+        var taken = 0
         var spun = 0
         var failed = false
-        var ok = true
+        var won = false
         if (sp != null) {
-            ok = sp.require == null || Orientation.bottomSymbol(o) == sp.require
-            if (ok) {
-                if (sp.bonus > 0 && !ignoreBonus) {
-                    val bit = 1 shl level.bonusIndex(cell)
-                    if (m and bit == 0) {
-                        m = m or bit
-                        s += sp.bonus
-                        gained = sp.bonus
-                    }
-                }
-                if (sp.spin != 0) {
-                    o = Orientation.spin(o, sp.spin > 0, cell.up)
-                    spun = sp.spin
-                }
-            } else {
-                failed = true
+            val ok = ignoreRequire || sp.require == null || Orientation.bottomSymbol(o) == sp.require
+            if (sp.spin != 0) {
+                o = Orientation.spin(o, sp.spin > 0, cell.up)
+                spun = sp.spin
             }
+            if (sp.key > 0) {
+                if (sp.key == k + 1) {
+                    if (ok) { k++; taken = sp.key } else failed = true
+                }
+            }
+            if (cell == level.goal) {
+                if (k == level.keyCount && ok) won = true else failed = true
+            }
+        } else if (cell == level.goal) {
+            won = k == level.keyCount
         }
-        val won = cell == level.goal && ok
-        return Landing(o, s, m, LandingEffect(gained, spun, failed), won)
+        return Landing(cell, o, k, LandingEffect(taken, spun, portalFrom, failed), won)
     }
 }
 
@@ -54,8 +56,7 @@ data class GameState(
     val level: Level,
     val cell: Cell,
     val orient: Int,
-    val stepsLeft: Int,
-    val mask: Int,
+    val keys: Int,
     val moves: Int,
     val status: Status,
     val lastEffect: LandingEffect = LandingEffect(),
@@ -63,13 +64,15 @@ data class GameState(
 ) {
     val bottomSymbol: Symbol get() = Orientation.bottomSymbol(orient)
 
-    fun isCollected(c: Cell): Boolean {
-        val idx = level.bonusIndex(c)
-        return idx >= 0 && (mask and (1 shl idx)) != 0
+    val goalOpen: Boolean get() = keys == level.keyCount
+
+    fun isKeyTaken(c: Cell): Boolean {
+        val n = level.specials[c]?.key ?: 0
+        return n in 1..keys
     }
 
     fun canMove(color: Int): Boolean =
-        status == Status.PLAYING && stepsLeft > 0 && level.isOpen(cell.neighborAcross(color))
+        status == Status.PLAYING && level.isOpen(cell.neighborAcross(color))
 
     fun legalMoves(): List<Int> = (0..2).filter { canMove(it) }
 
@@ -77,20 +80,12 @@ data class GameState(
         if (!canMove(color)) return null
         val next = cell.neighborAcross(color)
         val o = Orientation.tip(orient, color)
-        val l = Rules.land(level, next, o, stepsLeft - 1, mask)
-        val st = GameState(level, next, l.orient, l.stepsLeft, l.mask, moves + 1, Status.PLAYING, l.effect, color)
-        val status = when {
-            l.won -> Status.WON
-            st.legalMoves().isEmpty() -> Status.LOST
-            else -> Status.PLAYING
-        }
-        return st.copy(status = status)
+        val l = Rules.land(level, next, o, keys)
+        return GameState(level, l.cell, l.orient, l.keys, moves + 1, if (l.won) Status.WON else Status.PLAYING, l.effect, color)
     }
 
     companion object {
-        fun start(level: Level): GameState {
-            val st = GameState(level, level.start, level.startOrientation, level.steps, 0, 0, Status.PLAYING)
-            return if (st.legalMoves().isEmpty()) st.copy(status = Status.LOST) else st
-        }
+        fun start(level: Level): GameState =
+            GameState(level, level.start, level.startOrientation, 0, 0, Status.PLAYING)
     }
 }

@@ -4,40 +4,34 @@ import kotlin.random.Random
 
 /**
  * Random level generator. Deterministic for a given (seed, difficulty), so a
- * level can be shared or replayed by its seed.
+ * level can be shared or replayed by its number.
  *
  * Every candidate is checked with the solver:
  *  - it must be solvable,
- *  - the bonus steps must be necessary (not solvable with the same budget if bonuses are ignored),
- *  - the shortest solution must have a length that fits the difficulty,
- *  - from difficulty 2 the shortest solution must pass at least one spin cell,
- *  - the goal always demands a specific symbol.
+ *  - par (the fewest moves) must fit the difficulty,
+ *  - the symbol requirements must matter: ignoring them must give a shorter route,
+ *  - from difficulty 2 the optimal route must pass at least one spin cell.
  */
 object Generator {
 
     class Params(
         val rows: Int,
         val cols: Int,
-        val holeFraction: Double,
-        val bonusCells: IntRange,
+        val keys: Int,
         val spinCells: IntRange,
-        val bonusAmount: IntRange,
-        val minMoves: IntRange,
-        val slack: Int,
+        val portalPairs: IntRange,
+        val par: IntRange,
+        val minSymbolGain: Int,
         val requireSpinUsed: Boolean,
-        val goalRequireChance: Double,
-        val timeBase: Int,
-        val timePerMove: Double,
     )
 
     fun params(difficulty: Int): Params = when (difficulty.coerceIn(1, 3)) {
-        // tall boards (rows > cols) to fill a portrait phone screen; start at the bottom, goal at the top
-        1 -> Params(6, 3, 0.12, 1..2, 1..2, 2..3, 7..11, 1, false, 1.0, 25, 4.0)
-        2 -> Params(8, 4, 0.18, 2..3, 2..3, 2..4, 10..16, 0, true, 1.0, 20, 3.0)
-        else -> Params(10, 5, 0.22, 3..4, 3..4, 2..4, 14..22, 0, true, 1.0, 15, 2.5)
+        1 -> Params(6, 3, 1, 1..2, 0..0, 8..14, 1, false)
+        2 -> Params(8, 4, 2, 2..3, 1..1, 14..24, 2, true)
+        else -> Params(10, 5, 3, 3..4, 1..2, 24..40, 2, true)
     }
 
-    fun generate(seed: Long, difficulty: Int, maxAttempts: Int = 400): Level {
+    fun generate(seed: Long, difficulty: Int, maxAttempts: Int = 500): Level {
         val p = params(difficulty)
         val rnd = Random(seed * 31 + difficulty)
         var fallback: Level? = null
@@ -46,82 +40,56 @@ object Generator {
             val lvl = validate(cand, p)
             if (lvl != null) return lvl
             if (fallback == null) {
-                // keep something playable in case nothing meets all the quality rules
-                val mb = Solver.minBudget(cand)
-                if (mb != null) fallback = withBudget(cand, mb + p.slack, p)
+                Solver.shortestSolution(cand)?.let { fallback = withSolution(cand, it) }
             }
         }
         return fallback ?: generate(seed + 1, difficulty, maxAttempts)
     }
 
     private fun candidate(rnd: Random, p: Params, seed: Long, difficulty: Int): Level? {
-        val base = Level(p.rows, p.cols, emptySet(), Cell(0, 0, true), Cell(0, 0, true), emptyMap(), 0, 0, seed, difficulty)
+        val base = Level(p.rows, p.cols, Cell(0, 0, true), Cell(0, 0, true), emptyMap(), seed, difficulty)
         val all = base.allCells
         // start in the bottom third, goal in the top third
-        val bottom = all.filter { it.j < p.rows / 3 }
-        val top = all.filter { it.j >= p.rows - p.rows / 3 }
-        val start = bottom.random(rnd)
-        val goal = top.random(rnd)
-        val holes = HashSet<Cell>()
-        val nHoles = (all.size * p.holeFraction).toInt()
-        val pool = all.filter { it != start && it != goal }.shuffled(rnd)
-        holes.addAll(pool.take(nHoles))
-        val level0 = Level(p.rows, p.cols, holes, start, goal, emptyMap(), 0, 0, seed, difficulty)
-        if (!connected(level0)) return null
-        // specials
-        val free = level0.openCells.filter { it != start && it != goal }.shuffled(rnd).toMutableList()
+        val start = all.filter { it.j < p.rows / 3 }.random(rnd)
+        val goal = all.filter { it.j >= p.rows - p.rows / 3 }.random(rnd)
+        val free = all.filter { it != start && it != goal && !adjacent(it, start) && !adjacent(it, goal) }
+            .shuffled(rnd).toMutableList()
         val specials = HashMap<Cell, Special>()
-        val nBonus = p.bonusCells.random(rnd)
         val nSpin = p.spinCells.random(rnd)
-        if (free.size < nBonus + nSpin) return null
-        repeat(nBonus) {
-            val c = free.removeAt(0)
-            specials[c] = Special(bonus = p.bonusAmount.random(rnd), require = Symbol.entries.random(rnd))
+        val nPortal = p.portalPairs.random(rnd)
+        if (free.size < p.keys + nSpin + 2 * nPortal) return null
+        for (k in 1..p.keys) {
+            specials[free.removeAt(0)] = Special(key = k, require = Symbol.entries.random(rnd))
         }
         repeat(nSpin) {
-            val c = free.removeAt(0)
-            specials[c] = Special(spin = if (rnd.nextBoolean()) 1 else -1)
+            specials[free.removeAt(0)] = Special(spin = if (rnd.nextBoolean()) 1 else -1)
         }
-        if (rnd.nextDouble() < p.goalRequireChance) {
-            specials[goal] = Special(require = Symbol.entries.random(rnd))
+        for (id in 1..nPortal) {
+            // the two ends should not be neighbours of each other
+            val a = free.removeAt(0)
+            val bi = free.indexOfFirst { !adjacent(it, a) && it != a }
+            if (bi < 0) return null
+            val b = free.removeAt(bi)
+            specials[a] = Special(portal = id)
+            specials[b] = Special(portal = id)
         }
-        return Level(p.rows, p.cols, holes, start, goal, specials, 0, 0, seed, difficulty)
+        specials[goal] = Special(require = Symbol.entries.random(rnd))
+        return Level(p.rows, p.cols, start, goal, specials, seed, difficulty)
     }
+
+    private fun adjacent(a: Cell, b: Cell): Boolean = a.neighbors().any { it.second == b }
 
     private fun validate(cand: Level, p: Params): Level? {
-        val mb = Solver.minBudget(cand) ?: return null
-        val budget = mb + p.slack
-        val mbNoBonus = Solver.minBudget(cand, ignoreBonus = true, maxBudget = 120) ?: Int.MAX_VALUE
-        if (budget >= mbNoBonus) return null // bonuses not needed → boring
-        val path = Solver.shortestSolution(cand, budget) ?: return null
-        if (path.moves.size !in p.minMoves) return null
-        if (p.requireSpinUsed) {
-            val usesSpin = path.cells.any { (cand.specials[it]?.spin ?: 0) != 0 }
-            if (!usesSpin) return null
-        }
-        return withBudget(cand, budget, p, path)
+        val sol = Solver.shortestSolution(cand) ?: return null
+        if (sol.moves.size !in p.par) return null
+        val free = Solver.shortestSolution(cand, ignoreRequire = true) ?: return null
+        if (sol.moves.size - free.moves.size < p.minSymbolGain) return null
+        if (p.requireSpinUsed && sol.cells.none { (cand.specials[it]?.spin ?: 0) != 0 }) return null
+        return withSolution(cand, sol)
     }
 
-    private fun withBudget(cand: Level, budget: Int, p: Params, path: Solver.Path? = null): Level {
-        val sol = path ?: Solver.shortestSolution(cand, budget)
-        val moves = sol?.moves?.size ?: budget
-        val time = (p.timeBase + p.timePerMove * moves).toInt()
-        return Level(
-            cand.rows, cand.cols, cand.holes, cand.start, cand.goal, cand.specials,
-            budget, time, cand.seed, cand.difficulty, cand.startOrientation, sol?.moves ?: emptyList(),
-        )
-    }
-
-    /** Plain reachability start → goal, ignoring orientation and steps. */
-    private fun connected(level: Level): Boolean {
-        val seen = HashSet<Cell>()
-        val q = ArrayDeque<Cell>()
-        q.add(level.start); seen.add(level.start)
-        while (q.isNotEmpty()) {
-            val c = q.removeFirst()
-            if (c == level.goal) return true
-            for ((_, n) in c.neighbors()) if (level.isOpen(n) && seen.add(n)) q.add(n)
-        }
-        return false
-    }
+    private fun withSolution(cand: Level, sol: Solver.Path): Level = Level(
+        cand.rows, cand.cols, cand.start, cand.goal, cand.specials,
+        cand.seed, cand.difficulty, cand.startOrientation, sol.moves,
+    )
 }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Tetra-Escape</string>
-    <string name="steps_label">Steps</string>
-    <string name="time_label">Time</string>
-    <string name="time_value">%1$d s</string>
+    <string name="moves_label">Moves</string>
+    <string name="par_label">Fewest</string>
+    <string name="keys_value">Keys %1$d/%2$d</string>
     <string name="new_level">New level</string>
     <string name="retry">Retry</string>
     <string name="help">?</string>
@@ -13,15 +13,12 @@
     <string name="difficulty_hard">Hard</string>
     <string name="level_seed">Level no. %1$d · %2$s</string>
     <string name="level_info">Level no. %1$d, difficulty %2$s</string>
-    <string name="timer_hint">Timer starts on your first move</string>
     <string name="won_title">You escaped!</string>
-    <string name="won_message">%1$d moves, %2$d s to spare.</string>
-    <string name="lost_steps_title">Out of steps</string>
-    <string name="lost_time_title">Time is up</string>
-    <string name="lost_message">Try again?</string>
+    <string name="won_message">%1$d moves. The fewest possible is %2$d.</string>
+    <string name="won_perfect">%1$d moves – that is the fewest possible!</string>
     <string name="next_level">Next level</string>
     <string name="share">Share</string>
-    <string name="share_text">I escaped Tetra-Escape level %1$d (difficulty %2$d) in %3$d moves with %4$d s to spare.</string>
+    <string name="share_text">I escaped Tetra-Escape level %1$d (%2$s) in %3$d moves. Fewest possible: %4$d.</string>
     <string name="enter_seed_title">Play a specific level</string>
     <string name="enter_seed_hint">Level number</string>
     <string name="show_solution">Show solution</string>
@@ -32,5 +29,5 @@
     <string name="difficulty">Difficulty</string>
     <string name="preview_option">Show which symbol would land in each neighbouring cell</string>
     <string name="rules_title">How to play</string>
-    <string name="rules_text">Tip the glass tetrahedron onto a neighbouring triangle by tapping it. It does not slide – it rolls over an edge, so the symbol that ends up on the bottom changes with every move.\n\nReach the gold goal before you run out of steps.\n\nBlue cells give extra steps – but only if the symbol lying on the bottom is the one shown in the cell. You will not reach the goal without them.\n\nPurple cells spin the piece a third of a turn every time you land on them.\n\nIf the goal shows a symbol, you must arrive with that symbol on the bottom.\n\nThe faint symbols in the neighbouring cells show what would land there. The timer starts on your first move.</string>
+    <string name="rules_text">Tip the glass tetrahedron onto a neighbouring triangle by tapping it. It does not slide – it rolls over an edge, so the symbol that ends up on the bottom changes with every move.\n\nCollect the keys in order (1, 2, 3 …). A key is only taken when you land on it with the symbol shown in the cell on the bottom.\n\nThe goal is locked until you have every key, and it also wants a particular symbol on the bottom.\n\nPurple cells spin the piece a third of a turn every time you land on them. Ringed cells are portals: landing on one moves you to its twin.\n\nThere is no time limit and no step limit. The card at the top shows the fewest moves the level can be done in – try to match it. The faint symbols in the neighbouring cells show what would land there.</string>
 </resources>

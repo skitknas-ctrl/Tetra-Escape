@@ -1,8 +1,8 @@
 package io.github.skitknasctrl.tetraescape
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.text.InputType
 import android.view.View
 import android.widget.CheckBox
@@ -26,14 +26,13 @@ import kotlin.random.Random
 class MainActivity : AppCompatActivity(), GameView.Listener {
 
     private lateinit var gameView: GameView
-    private lateinit var stepsView: TextView
-    private lateinit var timeView: TextView
+    private lateinit var movesView: TextView
+    private lateinit var parView: TextView
     private lateinit var levelView: TextView
-    private lateinit var prefs: android.content.SharedPreferences
+    private lateinit var keysView: TextView
+    private lateinit var prefs: SharedPreferences
 
     private val executor = Executors.newSingleThreadExecutor()
-    private var timer: CountDownTimer? = null
-    private var timeLeftMs = 0L
     private var level: Level? = null
     private var difficulty = 1
     private var finished = false
@@ -44,7 +43,7 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         // Android 15 draws apps edge to edge: keep our content clear of the status bar and navigation bar.
-        val root = findViewById<android.view.View>(R.id.root)
+        val root = findViewById<View>(R.id.root)
         val basePad = root.paddingTop
         ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
@@ -52,9 +51,10 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
             insets
         }
         gameView = findViewById(R.id.game)
-        stepsView = findViewById(R.id.steps)
-        timeView = findViewById(R.id.time)
+        movesView = findViewById(R.id.moves)
+        parView = findViewById(R.id.par)
         levelView = findViewById(R.id.level)
+        keysView = findViewById(R.id.keys)
         gameView.listener = this
 
         prefs = getSharedPreferences("tetra", MODE_PRIVATE)
@@ -68,8 +68,8 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
 
         val seed = savedInstanceState?.getLong("seed") ?: randomSeed()
         newLevel(seed)
-        if (!prefs.getBoolean("helpShown", false)) {
-            prefs.edit().putBoolean("helpShown", true).apply()
+        if (!prefs.getBoolean("helpShown2", false)) {
+            prefs.edit().putBoolean("helpShown2", true).apply()
             showHelp()
         }
     }
@@ -81,7 +81,6 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
 
     override fun onDestroy() {
         super.onDestroy()
-        timer?.cancel()
         dialog?.dismiss()
         executor.shutdownNow()
     }
@@ -99,15 +98,13 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
 
     private fun startLevel(lvl: Level) {
         dialog?.dismiss()
-        timer?.cancel(); timer = null
         level = lvl
         finished = false
         replayShown = false
-        timeLeftMs = lvl.timeSeconds * 1000L
         gameView.setLevel(lvl)
         levelView.text = getString(R.string.level_seed, lvl.seed, difficultyName(lvl.difficulty))
+        parView.text = lvl.par.toString()
         updateHud(gameView.state!!)
-        timeView.text = getString(R.string.time_value, lvl.timeSeconds)
     }
 
     private fun difficultyName(d: Int): String = getString(
@@ -115,52 +112,28 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
     )
 
     private fun updateHud(st: GameState) {
-        stepsView.text = st.stepsLeft.toString()
+        movesView.text = st.moves.toString()
+        keysView.text = getString(R.string.keys_value, st.keys, st.level.keyCount)
     }
 
     // ---- GameView.Listener ----
 
-    override fun onFirstMove() {
-        val lvl = level ?: return
-        if (gameView.isAutoPlaying) return
-        timer?.cancel()
-        timer = object : CountDownTimer(lvl.timeSeconds * 1000L, 100) {
-            override fun onTick(ms: Long) {
-                timeLeftMs = ms
-                timeView.text = getString(R.string.time_value, (ms + 999) / 1000)
-            }
-            override fun onFinish() {
-                timeLeftMs = 0
-                timeView.text = getString(R.string.time_value, 0)
-                if (!finished) {
-                    finished = true
-                    showEnd(getString(R.string.lost_time_title), getString(R.string.lost_message), won = false)
-                }
-            }
-        }.start()
-    }
-
     override fun onMoved(state: GameState) {
         updateHud(state)
         if (finished) return
-        when (state.status) {
-            Status.WON -> {
-                finished = true
-                timer?.cancel()
-                if (gameView.isAutoPlaying || replayShown) {
-                    replayShown = false
-                    showEnd(getString(R.string.solution_title), getString(R.string.solution_done, state.moves), won = false)
-                    return
-                }
-                val secs = (timeLeftMs / 1000).toInt()
-                showEnd(getString(R.string.won_title), getString(R.string.won_message, state.moves, secs), won = true)
+        if (state.status == Status.WON) {
+            finished = true
+            val lvl = state.level
+            if (gameView.isAutoPlaying || replayShown) {
+                replayShown = false
+                showEnd(getString(R.string.solution_title), getString(R.string.solution_done, state.moves), won = false)
+                return
             }
-            Status.LOST -> {
-                finished = true
-                timer?.cancel()
-                showEnd(getString(R.string.lost_steps_title), getString(R.string.lost_message), won = false)
+            val msg = when {
+                state.moves <= lvl.par -> getString(R.string.won_perfect, state.moves)
+                else -> getString(R.string.won_message, state.moves, lvl.par)
             }
-            Status.PLAYING -> {}
+            showEnd(getString(R.string.won_title), msg, won = true)
         }
     }
 
@@ -172,9 +145,7 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
             b.setPositiveButton(R.string.next_level) { _, _ -> newLevel(randomSeed()) }
             b.setNeutralButton(R.string.share) { _, _ ->
                 val st = gameView.state
-                val text = getString(
-                    R.string.share_text, lvl.seed, lvl.difficulty, st?.moves ?: 0, (timeLeftMs / 1000).toInt(),
-                )
+                val text = getString(R.string.share_text, lvl.seed, difficultyName(lvl.difficulty), st?.moves ?: 0, lvl.par)
                 startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text)
                 }, null))
@@ -183,9 +154,6 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
         } else {
             b.setPositiveButton(R.string.retry) { _, _ -> startLevel(lvl) }
             b.setNegativeButton(R.string.new_level) { _, _ -> newLevel(randomSeed()) }
-            if (lvl.solution.isNotEmpty() && !gameView.isAutoPlaying && gameView.state?.status != Status.WON) {
-                b.setNeutralButton(R.string.show_solution) { _, _ -> showSolution() }
-            }
         }
         dialog = b.show()
     }
@@ -193,7 +161,6 @@ class MainActivity : AppCompatActivity(), GameView.Listener {
     private fun showSolution() {
         val lvl = level ?: return
         dialog?.dismiss()
-        timer?.cancel(); timer = null
         startLevel(lvl)
         replayShown = true
         levelView.text = getString(R.string.solution_playing)

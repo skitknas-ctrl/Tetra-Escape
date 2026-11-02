@@ -32,8 +32,8 @@
                 android:padding="8dp">
                 <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_steps" android:contentDescription="@null" />
                 <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/steps_label" android:textColor="@color/ink_soft" android:textSize="12sp" />
-                    <TextView android:id="@+id/steps" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/ink" android:textSize="30sp" android:textStyle="bold" android:fontFamily="serif" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/moves_label" android:textColor="@color/ink_soft" android:textSize="12sp" />
+                    <TextView android:id="@+id/moves" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/ink" android:textSize="30sp" android:textStyle="bold" android:fontFamily="serif" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -46,10 +46,10 @@
                 android:gravity="center_vertical"
                 android:background="@drawable/card_bg"
                 android:padding="8dp">
-                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_timer" android:contentDescription="@null" />
+                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/ic_target" android:contentDescription="@null" />
                 <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/time_label" android:textColor="@color/ink_soft" android:textSize="12sp" />
-                    <TextView android:id="@+id/time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/ink" android:textSize="30sp" android:textStyle="bold" android:fontFamily="serif" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/par_label" android:textColor="@color/ink_soft" android:textSize="12sp" />
+                    <TextView android:id="@+id/par" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="@color/ink" android:textSize="30sp" android:textStyle="bold" android:fontFamily="serif" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -65,7 +65,7 @@
                 <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_pin" android:contentDescription="@null" />
                 <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginStart="4dp">
                     <TextView android:id="@+id/level" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="" android:textColor="@color/ink" android:textSize="14sp" android:textStyle="bold" android:fontFamily="serif" android:background="?attr/selectableItemBackground" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/timer_hint" android:textColor="@color/ink_soft" android:textSize="10sp" />
+                    <TextView android:id="@+id/keys" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textColor="@color/ink_soft" android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

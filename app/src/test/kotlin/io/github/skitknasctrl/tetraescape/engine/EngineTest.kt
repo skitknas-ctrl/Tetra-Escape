@@ -54,7 +54,7 @@ class EngineTest {
 
     @Test
     fun orientationDependsOnlyOnCellWithoutSpins() {
-        val big = Level(6, 6, emptySet(), Cell(0, 0, true), Cell(0, 5, false), emptyMap(), 0, 0, 0, 1)
+        val big = Level(6, 6, Cell(0, 0, true), Cell(0, 5, false), emptyMap(), 0, 1)
         val seen = HashMap<Cell, Int>()
         val rnd = Random(1)
         repeat(20) {
@@ -72,25 +72,44 @@ class EngineTest {
     }
 
     @Test
-    fun generatedLevelsAreSolvableAndNeedBonuses() {
+    fun generatedLevelsAreSolvableAtPar() {
         for (d in 1..3) for (seed in 1L..6L) {
             val lvl = Generator.generate(seed, d)
             var st = GameState.start(lvl)
             for (m in lvl.solution) st = st.move(m) ?: throw AssertionError("illegal move seed=$seed d=$d")
             assertEquals("seed=$seed d=$d", Status.WON, st.status)
-            val noBonus = Solver.minBudget(lvl, ignoreBonus = true, maxBudget = 120)
-            assertTrue("bonus must be needed seed=$seed d=$d", noBonus == null || noBonus > lvl.steps)
-            assertNotNull(Solver.shortestSolution(lvl))
-            assertTrue(lvl.timeSeconds > 0)
+            assertEquals(lvl.par, st.moves)
+            assertEquals(lvl.keyCount, st.keys)
             assertNotNull("goal must demand a symbol seed=$seed d=$d", lvl.goalRequirement())
+            assertTrue(lvl.keyCount >= 1)
+            // the solver's own answer is never shorter than the stored one
+            assertEquals(lvl.par, Solver.shortestSolution(lvl)!!.moves.size)
         }
+    }
+
+    @Test
+    fun keysMustBeTakenInOrderAndWithTheRightSymbol() {
+        val lvl = Generator.generate(5, 2)
+        val st = GameState.start(lvl)
+        // walking the solution backwards from a fresh state must not hand out keys out of order
+        var keys = 0
+        var s = st
+        for (m in lvl.solution) {
+            s = s.move(m)!!
+            assertTrue(s.keys == keys || s.keys == keys + 1)
+            if (s.keys == keys + 1) {
+                val cell = s.cell
+                assertEquals(keys + 1, lvl.specials[cell]!!.key)
+                keys++
+            }
+        }
+        assertEquals(lvl.keyCount, keys)
     }
 
     @Test
     fun generatorIsDeterministic() {
         val a = Generator.generate(42, 2)
         val b = Generator.generate(42, 2)
-        assertEquals(a.holes, b.holes)
         assertEquals(a.specials, b.specials)
         assertEquals(a.solution, b.solution)
         assertEquals(a.steps, b.steps)

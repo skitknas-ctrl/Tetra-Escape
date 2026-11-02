@@ -40,8 +40,6 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     interface Listener {
         /** Called after every completed move (animation finished). */
         fun onMoved(state: GameState)
-        /** Called when the player makes the first move of a level. */
-        fun onFirstMove()
     }
 
     var listener: Listener? = null
@@ -75,12 +73,10 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     private var downY = 0f
 
     // ---- paints ----
-    // board look: cream tiles, gold grid with a gold bead at every vertex, grey stone for holes,
+    // board look: cream tiles, gold grid with a gold bead at every vertex,
     // coloured glass for special tiles
     private val cellFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFF8F3E8.toInt(); style = Paint.Style.FILL }
     private val cellInner = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x66FFFFFF; style = Paint.Style.STROKE }
-    private val holeFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFA8A49C.toInt(); style = Paint.Style.FILL }
-    private val holeInner = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x33000000; style = Paint.Style.STROKE }
     private val cellLine = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFC49A3C.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
     private val cellLineHi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x99FFE9A8.toInt(); style = Paint.Style.STROKE }
     private val dotFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFD4AA48.toInt(); style = Paint.Style.FILL }
@@ -89,9 +85,18 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     private val boardShadow = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x16000000; style = Paint.Style.FILL }
     private val legalLine = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF2E9E66.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
     private val legalTint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x2E3CC07A; style = Paint.Style.FILL }
-    private val bonusFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFB6DCFF.toInt() }
-    private val bonusInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF1B5FC2.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
-    private val bonusInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF1B5FC2.toInt(); style = Paint.Style.FILL }
+    private val keyFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFD27A.toInt() }
+    private val keyInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF8A4B00.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
+    private val keyInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF8A4B00.toInt(); style = Paint.Style.FILL }
+    private val keyBadge = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF8A4B00.toInt(); style = Paint.Style.FILL }
+    private val keyBadgeText = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFF4D6.toInt(); textAlign = Paint.Align.CENTER; isFakeBoldText = true }
+    private val portalFill1 = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFA6E6E3.toInt() }
+    private val portalInk1 = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF0E7C78.toInt(); style = Paint.Style.STROKE }
+    private val portalFill2 = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFC6A8.toInt() }
+    private val portalInk2 = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFB4461A.toInt(); style = Paint.Style.STROKE }
+    private val lockedFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFD9CFB8.toInt() }
+    private val lockedInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF6E5A30.toInt(); style = Paint.Style.STROKE; strokeJoin = Paint.Join.ROUND }
+    private val lockedInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF6E5A30.toInt(); style = Paint.Style.FILL }
     private val spinFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFDDB9F5.toInt() }
     private val spinInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF6E2FB0.toInt(); style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND }
     private val goalFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFF5C844.toInt() }
@@ -100,6 +105,7 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     private val usedFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFE4E0D6.toInt() }
     private val usedInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFADA89E.toInt(); style = Paint.Style.STROKE }
     private val usedInkFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFADA89E.toInt(); style = Paint.Style.FILL }
+    private val usedBadge = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFADA89E.toInt(); style = Paint.Style.FILL }
     private val glassHi = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x55FFFFFF; style = Paint.Style.FILL }
     private val startInk = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF8E6A1E.toInt(); style = Paint.Style.STROKE }
     private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF1B5FC2.toInt(); textAlign = Paint.Align.CENTER; isFakeBoldText = true }
@@ -176,10 +182,12 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         cellLine.strokeWidth = lw
         cellLineHi.strokeWidth = lw * 0.35f
         cellInner.strokeWidth = scale * 0.05f
-        holeInner.strokeWidth = scale * 0.05f
         dotEdge.strokeWidth = scale * 0.012f
         legalLine.strokeWidth = lw * 2.2f
-        bonusInk.strokeWidth = scale * 0.04f
+        keyInk.strokeWidth = scale * 0.04f
+        portalInk1.strokeWidth = scale * 0.05f
+        portalInk2.strokeWidth = scale * 0.05f
+        lockedInk.strokeWidth = scale * 0.04f
         spinInk.strokeWidth = scale * 0.045f
         goalInk.strokeWidth = scale * 0.04f
         usedInk.strokeWidth = scale * 0.04f
@@ -282,22 +290,20 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         val lv = st.level
         val sp = lv.specials[c]
         val p = cellPath(c)
-        if (c in lv.holes) {
-            canvas.drawPath(p, holeFill)
-            canvas.save(); canvas.clipPath(p); canvas.drawPath(p, holeInner); canvas.restore()
-            return
-        }
-        val collected = sp != null && sp.bonus > 0 && st.isCollected(c)
+        val taken = sp != null && sp.key > 0 && st.isKeyTaken(c)
+        val isNextKey = sp != null && sp.key == st.keys + 1
         val special = c == lv.goal || sp != null
         val fill = when {
-            c == lv.goal -> goalFill
-            collected -> usedFill
-            sp != null && sp.bonus > 0 -> bonusFill
+            c == lv.goal -> if (st.goalOpen) goalFill else lockedFill
+            taken -> usedFill
+            sp != null && sp.key > 0 -> keyFill
             sp != null && sp.spin != 0 -> spinFill
+            sp != null && sp.portal == 1 -> portalFill1
+            sp != null && sp.portal >= 2 -> portalFill2
             else -> cellFill
         }
         canvas.drawPath(p, fill)
-        if (special && !collected) {
+        if (special && !taken) {
             // glass highlight: a lighter wedge in the apex half of the tile
             canvas.save(); canvas.clipPath(p)
             val (gx, gy) = c.center()
@@ -316,29 +322,52 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         }
         if (c == lv.goal) {
             val req = sp?.require
+            val ink = if (st.goalOpen) goalInk else lockedInk
+            val inkFill = if (st.goalOpen) goalInkFill else lockedInkFill
             if (req != null) {
-                drawSymbolInCell(canvas, c, req, goalInk, goalInkFill)
+                drawSymbolInCell(canvas, c, req, ink, inkFill, shift = if (st.goalOpen) 0f else 0.12f, size = if (st.goalOpen) 1f else 0.8f)
             } else {
-                canvas.drawCircle(scx, scy, scale * 0.17f, goalInk)
-                canvas.drawCircle(scx, scy, scale * 0.07f, goalInkFill)
+                canvas.drawCircle(scx, scy, scale * 0.17f, ink)
+                canvas.drawCircle(scx, scy, scale * 0.07f, inkFill)
             }
+            if (!st.goalOpen) drawLock(canvas, c, inkFill)
             return
         }
         if (sp == null) return
-        if (sp.bonus > 0) {
-            val ink = if (collected) usedInk else bonusInk
-            val inkFill = if (collected) usedInkFill else bonusInkFill
-            // symbol in the upper (apex) part, the number near the wide base – no overlap
+        if (sp.key > 0) {
+            val ink = if (taken) usedInk else keyInk
+            val inkFill = if (taken) usedInkFill else keyInkFill
+            // symbol in the apex part, the key number in a badge near the wide base
             sp.require?.let { drawSymbolInCell(canvas, c, it, ink, inkFill, shift = 0.14f, size = 0.78f) }
-            val pt = floatArrayOf(SymbolPaths.CX, 0.13f)
+            val pt = floatArrayOf(SymbolPaths.CX, 0.15f)
             cellMatrix(c).mapPoints(pt)
-            text.color = ink.color
-            text.textSize = scale * 0.17f
-            canvas.drawText("+${sp.bonus}", pt[0], pt[1] + text.textSize * 0.36f, text)
+            val r = scale * 0.11f
+            canvas.drawCircle(pt[0], pt[1], r, if (taken) usedBadge else keyBadge)
+            if (isNextKey) canvas.drawCircle(pt[0], pt[1], r + scale * 0.025f, keyInk)
+            keyBadgeText.textSize = r * 1.5f
+            canvas.drawText(if (taken) "✓" else sp.key.toString(), pt[0], pt[1] + keyBadgeText.textSize * 0.36f, keyBadgeText)
+        }
+        if (sp.portal > 0) {
+            val ink = if (sp.portal == 1) portalInk1 else portalInk2
+            canvas.drawCircle(scx, scy, scale * 0.2f, ink)
+            canvas.drawCircle(scx, scy, scale * 0.11f, ink)
+            canvas.drawCircle(scx, scy, scale * 0.035f, Paint(ink).apply { style = Paint.Style.FILL })
         }
         if (sp.spin != 0) {
-            drawSpinArrow(canvas, scx, scy, sp.spin > 0, if (sp.bonus > 0) scale * 0.13f else scale * 0.2f, towardWide, sp.bonus > 0)
+            drawSpinArrow(canvas, scx, scy, sp.spin > 0, scale * 0.2f, towardWide, false)
         }
+    }
+
+    /** Small padlock near the wide base of the goal cell while keys are missing. */
+    private fun drawLock(canvas: Canvas, c: Cell, ink: Paint) {
+        val pt = floatArrayOf(SymbolPaths.CX, 0.16f)
+        cellMatrix(c).mapPoints(pt)
+        val w = scale * 0.16f; val h = scale * 0.12f
+        val body = RectF(pt[0] - w / 2, pt[1] - h / 2, pt[0] + w / 2, pt[1] + h / 2)
+        canvas.drawRoundRect(body, scale * 0.02f, scale * 0.02f, ink)
+        val sh = Paint(ink).apply { style = Paint.Style.STROKE; strokeWidth = scale * 0.03f }
+        val r = w * 0.3f
+        canvas.drawArc(RectF(pt[0] - r, pt[1] - h / 2 - r * 1.6f, pt[0] + r, pt[1] - h / 2 + r * 0.4f), 180f, 180f, false, sh)
     }
 
     /** Circular arrow around the centroid; clockwise on screen when [cw]. */
@@ -539,12 +568,11 @@ class GameView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     fun startTip(color: Int) {
         val st = state ?: return
         val next = st.move(color) ?: return
-        if (st.moves == 0) listener?.onFirstMove()
         pendingState = next
         tipColor = color
         tipT = 0f
         // pick the rotation sign that brings the apex down onto the new corner
-        val target = next.cell.cornerOfColor(color)
+        val target = st.cell.neighborAcross(color).cornerOfColor(color)
         val tx = Cell.ptX(target); val ty = Cell.ptY(target)
         val a = st.cell.cornerOfColor((color + 1) % 3)
         val b = st.cell.cornerOfColor((color + 2) % 3)
